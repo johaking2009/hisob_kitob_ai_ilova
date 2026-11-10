@@ -1,0 +1,27 @@
+{
+  "name": "hisob-kitob-tg-bot",
+  "version": "1.0.0",
+  "description": "Hisob-Kitob Telegram Boti (Balans, Qarzdorlik, Berilgan qarzlar)",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js",
+    "bot": "node bot.js",
+    "server": "node server.js"
+  },
+  "keywords": [
+    "telegram",
+    "bot",
+    "finance",
+    "debt",
+    "hisob-kitob"
+  ],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.7",
+    "express": "^4.21.2",
+    "sqlite3": "^5.1.7",
+    "telegraf": "^4.16.3"
+  }
+}
