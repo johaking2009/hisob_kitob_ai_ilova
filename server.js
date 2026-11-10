@@ -119,7 +119,8 @@ app.listen(PORT, '0.0.0.0', () => {
 
 // Start Telegram Bot
 console.log("🤖 Telegram Bot ishga tushirilmoqda...");
-bot.launch({ dropPendingUpdates: true })
+bot.telegram.deleteWebhook({ drop_pending_updates: true })
+  .then(() => bot.launch({ dropPendingUpdates: true }))
   .then(() => {
     console.log(`🤖 Telegram Bot muvaffaqiyatli ishga tushdi!`);
   })
