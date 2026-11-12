@@ -107,26 +107,37 @@ app.post('/api/debt/pay', async (req, res) => {
   }
 });
 
-// Start Express Server
-app.listen(PORT, '0.0.0.0', () => {
+// Start Express Server & Telegram Bot
+app.listen(PORT, '0.0.0.0', async () => {
   const localIp = getLocalIpAddress();
   console.log(`\n==================================================`);
   console.log(`🌐 Express Server 0.0.0.0:${PORT} manzilida ishga tushdi!`);
   console.log(`📱 Telefondagi ilovada sozlashingiz kerak bo'lgan manzil:`);
   console.log(`👉 http://${localIp}:${PORT}`);
   console.log(`==================================================\n`);
-});
 
-// Start Telegram Bot
-console.log("🤖 Telegram Bot ishga tushirilmoqda...");
-bot.telegram.deleteWebhook({ drop_pending_updates: true })
-  .then(() => bot.launch({ dropPendingUpdates: true }))
-  .then(() => {
-    console.log(`🤖 Telegram Bot muvaffaqiyatli ishga tushdi!`);
-  })
-  .catch((err) => {
-    console.error("❌ Botni ishga tushirishda xatolik:", err);
-  });
+  const renderUrl = process.env.RENDER_EXTERNAL_URL;
+  if (renderUrl) {
+    // Production on Render: Use Webhook (Eliminates 409 Conflict completely!)
+    try {
+      const webhookPath = '/telegram-webhook';
+      app.use(bot.webhookCallback(webhookPath));
+      await bot.telegram.setWebhook(`${renderUrl}${webhookPath}`, { drop_pending_updates: true });
+      console.log(`🤖 Telegram Bot Webhook (Render) muvaffaqiyatli o'rnatildi: ${renderUrl}${webhookPath}`);
+    } catch (err) {
+      console.error("❌ Webhook o'rnatishda xatolik:", err.message);
+    }
+  } else {
+    // Local development: Use Long Polling
+    try {
+      await bot.telegram.deleteWebhook({ drop_pending_updates: true });
+      await bot.launch({ dropPendingUpdates: true });
+      console.log("🤖 Telegram Bot Polling (Lokal) muvaffaqiyatli ishga tushdi!");
+    } catch (err) {
+      console.error("❌ Polling ishga tushirishda xatolik:", err.message);
+    }
+  }
+});
 
 // Graceful shutdown
 process.once('SIGINT', () => bot.stop('SIGINT'));
